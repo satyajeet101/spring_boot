@@ -1,5 +1,6 @@
 package com.satya.demo.service;
 
+import com.satya.demo.config.PropertiesReader;
 import com.satya.demo.dto.ProductResponse;
 import com.satya.demo.entity.ProductEntity;
 import com.satya.demo.exception.ProductNotFoundException;
@@ -9,20 +10,25 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
     @Autowired
     ProductRepo productRepo;
+    @Autowired
+    PropertiesReader propertiesReader;
+    @Autowired
+    private ModelMapper modelMapper;
+    @PostConstruct
+    public void loadAfterBeansCreatedAndInjected() {
+        System.out.println("Beans created and injected.....");
+        System.out.println("Profile in use : "+propertiesReader.getProfileInUse());
+        System.out.println("My Name : "+propertiesReader.getMyNameFromPropertyFile());
+        System.out.println("My Age : "+propertiesReader.getMyAgeFromPropertyFile());
+    }
     public List<ProductResponse> getProduct() {
         List<ProductEntity> productEntityList = productRepo.findAll();
-        return productEntityList.stream().map((x)->{
-            ProductResponse productResponse = new ProductResponse();
-            productResponse.setProductName(x.getProductName());
-            productResponse.setProductPrice(x.getProductPrice());
-            return productResponse;
-        }).collect(Collectors.toList());
+        return productEntityList.stream().map((x)-> modelMapper.map(x, ProductResponse.class)).toList();
     }
     public ProductEntity addProduct(ProductEntity product) {
         return productRepo.save(product);
