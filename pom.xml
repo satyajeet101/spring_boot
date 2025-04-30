@@ -77,18 +77,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>devEnv</id>
-			<properties>
-				<spring-boot.run.profiles>dev</spring-boot.run.profiles>
-			</properties>
-		</profile>
-		<profile>
-			<id>qaEnv</id>
-			<properties>
-				<spring-boot.run.profiles>qa</spring-boot.run.profiles>
-			</properties>
-		</profile>
-	</profiles>
 </project>
