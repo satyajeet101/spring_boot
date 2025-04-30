@@ -9,16 +9,20 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
     @Autowired
     ProductRepo productRepo;
-    @Autowired
-    private ModelMapper modelMapper;
     public List<ProductResponse> getProduct() {
         List<ProductEntity> productEntityList = productRepo.findAll();
-        return productEntityList.stream().map((x)-> modelMapper.map(x, ProductResponse.class)).toList();
+        return productEntityList.stream().map((x)->{
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.setProductName(x.getProductName());
+            productResponse.setProductPrice(x.getProductPrice());
+            return productResponse;
+        }).collect(Collectors.toList());
     }
     public ProductEntity addProduct(ProductEntity product) {
         return productRepo.save(product);
