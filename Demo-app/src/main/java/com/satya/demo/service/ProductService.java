@@ -26,7 +26,7 @@ public class ProductService {
         System.out.println("My Name : "+propertiesReader.getMyNameFromPropertyFile());
         System.out.println("My Age : "+propertiesReader.getMyAgeFromPropertyFile());
     }
-    private ModelMapper modelMapper;
+   // private ModelMapper modelMapper;
 
     public List<ProductResponse> getProduct() {
         List<ProductEntity> productEntityList = productRepo.findAll();
