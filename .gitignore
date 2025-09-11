@@ -1,3 +1,5 @@
 */.gitattributes
 */.mvn*
 */.idea/*
+.idea/*
+*/.gitignore
