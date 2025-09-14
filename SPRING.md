@@ -37,7 +37,7 @@ Movie movie = builder.build()
 - You can also set headers (like auth tokens) with .header("Authorization", "Bearer xyz").
 ## Service-Discovery
 ### Client Side
-![clientSideDiscovery.png](assets%2FclientSideDiscovery.png)
+![img.png](assets/clientSideDiscovery.png)
 ### Server Side
 ![serverSideDiscovery.png](assets%2FserverSideDiscovery.png)
 ### Eureka Configuration
