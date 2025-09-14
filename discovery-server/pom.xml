@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>movie-catalog-service</artifactId>
+	<artifactId>discovery-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>movie-catalog-service</name>
-	<description>Movie catalog service</description>
+	<name>discovery-server</name>
+	<description>discovery-server</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,26 +32,13 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.40</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -65,6 +52,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 	<build>
 		<plugins>
 			<plugin>

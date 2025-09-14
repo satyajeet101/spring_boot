@@ -1,6 +1,6 @@
 
 # Contents
-[Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient)
+[Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery)
 
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
@@ -29,3 +29,44 @@ Movie movie = builder.build()
         .bodyToMono(Movie.class)
         .block();
 ```
+### Note
+- .bodyToMono() → for a single object. 
+- .bodyToFlux() → for a list/stream of objects. 
+- You can add .onStatus() to handle error responses gracefully. 
+- You can also set headers (like auth tokens) with .header("Authorization", "Bearer xyz").
+## Service-Discovery
+### Client Side
+![clientSideDiscovery.png](assets%2FclientSideDiscovery.png)
+### Server Side
+![serverSideDiscovery.png](assets%2FserverSideDiscovery.png)
+### Eureka Configuration
+#### Server Configuration
+   - Add @EnableEurekaServer in app class
+   - Add pom dependency
+        ```json
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        ```
+   - Add property
+       ```json
+         server.port=8761
+         eureka.client.register-with-eureka=false
+         eureka.client.fetch-registry=false
+        ```
+![runningEureka.png](assets%2FrunningEureka.png)
+#### Client configuration
+   - @EnableEurekaClient,  with newer version not mandatory for client
+   - If server is running on default port no need any prop in property file 
+     else we have to add below in prop file
+     - spring.application.name=movie-service
+       eureka.client.service-url.defaultZone=http://localhost:9090/eureka/
+#### Calling
+```java
+    @Bean
+    @LoadBalanced //Add this while creating RestTemplate or WebClient.Builder builder = WebClient.builder();
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+```
+- while calling use service name in url insted of hostname
+  http://RATING-DATA-SERVICE/rating/users/
