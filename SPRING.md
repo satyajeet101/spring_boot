@@ -1,6 +1,7 @@
 
 # Contents
-[Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery)
+[Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
+[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern)
 
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
@@ -70,3 +71,23 @@ Movie movie = builder.build()
 ```
 - while calling use service name in url insted of hostname
   http://RATING-DATA-SERVICE/rating/users/
+## Issues
+### Instance of microservice is down
+### Microservice is slow
+## Hystrix
+1. Add maven dep
+2. Add annotation in spring class @EnableCircuitBreaker
+3. Add Hystrix command to method which want to enable hystrix 
+   @HystrixCommand(fallbacMethod="methodName")
+4. Configure behavior 
+![hystrixParam.png](assets%2FhystrixParam.png)
+#### NOTE: 
+with latest version of spring cloud Hystrix is not supported in that case you have to use
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+</dependency>
+## BulkHead-Pattern
+The Bulkhead Pattern is a resilience pattern that isolates resources (like threads, memory, or connection pools) 
+for different parts of a system, so that a failure in one area does not bring down the entire system.
+![bulkHead.png](assets%2FbulkHead.png)
