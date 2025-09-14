@@ -60,7 +60,7 @@ Movie movie = builder.build()
    - If server is running on default port no need any prop in property file 
      else we have to add below in prop file
      - spring.application.name=movie-service
-       eureka.client.service-url.defaultZone=http://localhost:9090/eureka/
+     - eureka.client.service-url.defaultZone=http://localhost:9090/eureka/
 #### Calling
 ```java
     @Bean
