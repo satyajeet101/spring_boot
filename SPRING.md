@@ -1,8 +1,17 @@
 
 # Contents
-[Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
+[Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
+[Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
 [Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern)
 
+## Annotations
+- @Value
+  - @Value("${my.name}")
+  - @Value("${my.name: default value}")
+  - @Value("some static message") private String str;
+  - @Value("${my.values}") private List<String>listValue
+- @ConfigurationProperties("db") // anything starting with db like db.host, db.name 
+  will be assigned to respective property of the class  
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
 
@@ -11,6 +20,34 @@ Microservices take the concept further by breaking applications into smaller, fi
 SOA is more suitable for legacy, enterprise-wide integration, while microservices are designed for cloud-native, scalable, CI/CD-friendly systems.
 
 In short: SOA = centralized, coarse-grained, ESB-driven; Microservices = decentralized, fine-grained, independently deployable.
+## Profile
+- Default profile is always active
+- Naming
+  - application-<profile name>.extn
+- In prop file, Add
+  - spring.profile.active: profile name
+- We can also select which bean to load during startup 
+  - @Profile("profile name") 
+## Spring-cloud-config-server
+- Create a Spring project with dependency 
+  - spring-cloud-config-server
+- Add 
+  - @EnableConfigServer to main class
+- In prop file add
+  - spring.cloud.config.server.git.url = github path wher we maintain config
+- Now its ready at
+  - localhost:port/application/profileName
+- Now to use this config server in any project
+  - Add client dependency
+    - spring-cloud-starter-config
+  - In prop file
+    - spring.cloud.config.uri= localhost:port
+  - Now all the prop in files will be updated with the value from config server
+- Now the app is associated with prop file only during startup so to read the latest config
+  - Add actuator dependency to use one of its endpoint
+  - Add @RefreshScope to the property we need to update
+  - Call /actuator/refresh end point
+  - here you go you got your prop updated 
 ## RestTemplate
 - By default, available with spring boot web
 - It is synchronous by default.
