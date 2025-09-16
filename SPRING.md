@@ -2,7 +2,8 @@
 # Contents
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
-[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads)
+[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
+[Spring Security](#Spring-Security) | [PACT](#PACT) | [CDC](#CDC)
 
 ## Annotations
 - @SpringBootApplication
@@ -170,3 +171,19 @@ for different parts of a system, so that a failure in one area does not bring do
       ```java
         Thread virtualThread = Thread.ofVirtual().start(() -> System.out.println("Running in " + Thread.currentThread()));
       ```
+## Spring-Security
+with Spring security we can manage
+- Authentication (Who the user is)
+- Authorization (What User can access)
+- with combination of
+  - Password encoding
+  - Role based access control
+  - session management
+  - OAuth2, JWT, and more
+### Steps
+1. Add spring security dependency
+    - Every endpoint is now secure
+    - Spring auto generate a login form 
+    - And default user is created with random password
+## PACT
+## CDC
