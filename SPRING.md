@@ -2,9 +2,27 @@
 # Contents
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
-[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern)
+[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads)
 
 ## Annotations
+- @SpringBootApplication
+    - @Configuration + @EnableAutoConfiguration + @ComponentScan
+- @Component
+    - if a class doesn't fit into controller, Repo or service we can mark with this to be managed by spring
+- @Service
+- @Repository
+- @Controller
+    - returns view
+- @REstController
+    - @Controller + @ResponseBody
+    - Returns http response
+- @RequestMapping("/api")
+- @GetMapping("/users")
+- @PostMapping("user")
+    - (@RequestBody User user){}
+- @Entity
+    - @Id
+    - @GeneratedValue(strategy = GenerationType.IDENTITY)
 - @Value
   - @Value("${my.name}")
   - @Value("${my.name: default value}")
@@ -128,3 +146,27 @@ with latest version of spring cloud Hystrix is not supported in that case you ha
 The Bulkhead Pattern is a resilience pattern that isolates resources (like threads, memory, or connection pools) 
 for different parts of a system, so that a failure in one area does not bring down the entire system.
 ![bulkHead.png](assets%2FbulkHead.png)
+## Virtual-vs-Platform-Threads
+1. Platform Threads
+    - Platform threads are OS-level threads created and managed by the Java Virtual Machine (JVM) but mapped directly to underlying operating system threads.
+    - Key Characteristics
+        - Backed by OS threads → heavy resource usage.
+        - Managed by OS scheduler.
+        - Thread creation is expensive.
+        - Limited scalability due to 1:1 mapping with OS threads.
+      ```java
+        Thread platformThread = new Thread(() -> System.out.println("Running in " + Thread.currentThread()));
+        // Platform Thread
+        platformThread.start();
+      ```
+2. Virtual Threads
+    - Virtual threads are lightweight threads managed by the JVM (not the OS) and are built on top of platform threads using the ForkJoinPool internally.
+    - Key Characteristics
+        - User-mode threads → created and scheduled by the JVM, not the OS.
+        - Much lighter than platform threads.
+        - Thousands to millions can be created without high memory cost.
+        - Perfect for I/O-bound tasks (e.g., HTTP calls, DB queries).
+        - Uses continuations internally to park and resume threads efficiently.
+      ```java
+        Thread virtualThread = Thread.ofVirtual().start(() -> System.out.println("Running in " + Thread.currentThread()));
+      ```
