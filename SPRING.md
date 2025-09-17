@@ -208,3 +208,99 @@ with Spring security we can manage
 - chose cache provide like(EhCache or HazelCast) or use default concurant map based cache provided by spring-boot-starter-cache
 ## PACT
 ## CDC
+```TODO
+SPRING SECURITY
+https://www.youtube.com/watch?v=GH7L4D8Q_ak&list=PLxhSr_SLdXGOpdX60nHze41CvExvBOn09&index=10
+@SpringBootApplication
+
+Form based auth and basic auth
+
+1. Add Spring security dependency,
+As soon as you add it for any endpoit it will starts giving login page by default
+you can add User/PWD in property file
+
+default security class is 
+	SpringBootWebSecurityConfiguration.java
+default security method is 
+	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http){
+	}
+
+Now to take controll of default method we have to create our own class
+1. Create any class
+2. Add annotations,
+	@Configuration
+	@EnableWebsucrity
+3. add @Autowire for DataSource dataSource	
+4. Add method
+5. Add annotation
+	@Bean
+6. by default it is statefull and done through jsessionId
+   to make it stateless we have to add 
+   http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+To take controll of user/password
+1. create a method and annotate with bean as below
+	public UserDetailsService userDetailsService(){
+		UserDetails user1 = User.withUserName("user1")
+								.password(passwordEncoder().encode("password").roles("USER").build();
+		JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);//datasource is autowired
+		userDetailsManager.create(user1)
+		return new userDetailsManager;
+	}
+
+Now lets add the encoder
+1. Create a method and annotate @Bean as below
+	public PasswordEncoder passwordEncoder(){
+		return new BcryptPasswordEncoder();
+	}
+
+Now to execute any endpoint based on roles,
+1. Add below annotation to endpoint in controller 
+	@PreAuthorize("hasRole('USER')")
+2. Add below in securty	classs created earlier
+	@EnableMethodSecurity
+
+Till now we are able to create user and authenticate the user.
+
+>>>>>>>>>>>>>>>>>>  >>>>>>>>>>>>>>>>>>  JWT  <<<<<<<<<<<<<<<<<<    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+JwtUtils
+AuthTokenFilter
+AuthEntryPointJwt
+SecurityConfig
+
+
+1. Add maven dependency for jwt 
+	jjwt-impl
+	jjwt-jackson
+	jjwt-api
+	
+2. Create a class JwtUtils to perforn basic jwwt related task and annotate with @Component
+a. add secret 
+b. add expiration
+c. method to generate token based on username,  date, exp time, secret key
+	return Jwts.builder().subject(userName).issuedAt(new Date()).expiration(expiration).signWith(key()).compact();
+d. method to read authorization from header and return token after trimming everything
+e. method to get userName from token
+	return Jwts.parser().verifyWith(key()).build().parsedSignedClaims(token).getPayload().getSubject();
+f. method to validate token 
+	Jwts.parser().verifyWith(key()).build().parsedSignedClaims(token);
+	
+private Key key(){
+	return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+}	
+
+3. Create a coustom class AuthTokenFilter to intercept any request annotate with @Component and extend with OncePerRequestFilter
+a. @Autowire JwtUtils
+b. @Autowire UserDetailsService
+c. override doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+	get jwt using util
+	validate jwt using util
+	get username using util
+	validate the user 
+	and set to context
+	and continue the filter chain >> filterChain.doFilter(request, response)
+	
+4. Create a class AuthEntryPointJwt annotate with @Component and implement AuthenticationEntryPoint
+a. override commence(HttpServletRequest request, HttpServletResponse response) method 
+	which will be called in case of auth exception from filter and update the response to hold the unauthorized
+```
