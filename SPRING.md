@@ -3,7 +3,7 @@
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
 [Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
-[Spring Security](#Spring-Security) | [PACT](#PACT) | [CDC](#CDC)
+[Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC)
 
 ## Annotations
 - @SpringBootApplication
@@ -30,7 +30,15 @@
   - @Value("some static message") private String str;
   - @Value("${my.values}") private List<String>listValue
 - @ConfigurationProperties("db") // anything starting with db like db.host, db.name 
-  will be assigned to respective property of the class  
+  will be assigned to respective property of the class
+- @SpringBootTest integration testing and it sets the spring context
+- @MockBean create a fake bean during unit testing
+- @Transactional
+- Acync operation
+	- add @Async on method
+	- @EnableAsync by adding in config class
+- @Qualifier("beanName") to mark which bean to inject
+    - @Primary on one bean to make it as default injection
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
 
@@ -181,9 +189,22 @@ with Spring security we can manage
   - session management
   - OAuth2, JWT, and more
 ### Steps
-1. Add spring security dependency
-    - Every endpoint is now secure
-    - Spring auto generate a login form 
-    - And default user is created with random password
+- Add spring security in pom, it will enable the form login by default
+- Create a configuration class 	@Configuration @EnableWebsucrity
+- SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http){
+- Take controll of 	public UserDetailsService userDetailsService(){
+- Create encoder	public PasswordEncoder passwordEncoder(){return new BcryptPasswordEncoder();}
+- Add below annotation to endpoint in controller @PreAuthorize("hasRole('USER')")
+## Multi-data-source
+- in prop file enter detail for read and write both 
+- no create 2 diff repo for read na write
+- @JdbcRepository(dataSource = "read") or  @JdbcRepository(dataSource = "write") //whatevr source name you have given in prop file
+- inject what ever you need
+## Spring-Caching
+- add dependency spring-boot-starter-cache
+- @EnableCaching in main class
+- @Cacheable on method need to be cached
+- we can custmize cache behaviour using @CacheEvict and @CachePut
+- chose cache provide like(EhCache or HazelCast) or use default concurant map based cache provided by spring-boot-starter-cache
 ## PACT
 ## CDC
