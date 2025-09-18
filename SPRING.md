@@ -2,7 +2,7 @@
 # Contents
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
-[Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
+[Issues With Microservices](#Issues-With-Microservices) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) | 
 [Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status)
 
@@ -145,9 +145,9 @@ Movie movie = builder.build()
 ```
 - while calling use service name in url insted of hostname
   http://RATING-DATA-SERVICE/rating/users/
-## Issues
-### Instance of microservice is down
-### Microservice is slow
+## Issues-With-Microservices)
+#### Instance of microservice is down
+#### Microservice is slow
 ## Hystrix
 1. Add maven dep
 2. Add annotation in spring class @EnableCircuitBreaker
