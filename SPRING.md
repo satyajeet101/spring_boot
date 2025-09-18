@@ -45,6 +45,9 @@
 	- add @Async on method
 	- @EnableAsync by adding in config class
 - @Qualifier("beanName") to mark which bean to inject
+    - When you have multiple beans of the same type.
+    - Often used in multi-implementation scenarios
+    - When you want fine-grained control over which bean to inject.
     - @Primary on one bean to make it as default injection
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
