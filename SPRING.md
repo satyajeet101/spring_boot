@@ -49,6 +49,13 @@
     - Often used in multi-implementation scenarios
     - When you want fine-grained control over which bean to inject.
     - @Primary on one bean to make it as default injection
+- @ControllerAdvice to mark any class global exception handler
+	- @ExceptionHandler // to mark the method as exception handler class in global exception handler class
+- @NotBlank(message = "Name is required") private String name;
+- @Email(message = "Email should be valid") private String email;
+- @Size(min = 6, message = "Password must be at least 6 characters") private String password;
+- @Valid
+  	- public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {}
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
 
