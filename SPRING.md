@@ -18,7 +18,13 @@
     - @Controller + @ResponseBody
     - Returns http response
 - @RequestMapping("/api")
-- @GetMapping("/users")
+- In case of query param
+	- @GetMapping("/users")
+	    - (@RequestParam String name)
+	    - (@RequestParam(required = false, defaultValue = "Guest") String name)
+- In case of path param
+	- @GetMapping("/users/{id}")
+    	- public String getUserById(@PathVariable int id)
 - @PostMapping("user")
     - (@RequestBody User user){}
 - @Entity
