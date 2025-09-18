@@ -145,7 +145,7 @@ Movie movie = builder.build()
 ```
 - while calling use service name in url insted of hostname
   http://RATING-DATA-SERVICE/rating/users/
-## Issues-With-Microservices)
+## Issues-With-Microservices
 #### Instance of microservice is down
 #### Microservice is slow
 ## Hystrix
