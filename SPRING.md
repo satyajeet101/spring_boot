@@ -3,7 +3,7 @@
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
 [Issues With Microservices](#Issues) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
-[Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC)
+[Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling)
 
 ## Annotations
 - @SpringBootApplication
@@ -214,6 +214,177 @@ with Spring security we can manage
 - chose cache provide like(EhCache or HazelCast) or use default concurant map based cache provided by spring-boot-starter-cache
 ## PACT
 ## CDC
+## Exceptions-Handling
+- Best Practices:
+	- Use appropriate HTTP status codes (400, 404, 500, etc.)
+	- Return a structured JSON error response
+	- Log the error for debugging
+	- Avoid exposing sensitive internal details
+ - Using @ControllerAdvice for Global Exception Handling
+   	- Define a Custom Exception
+   	  	```java
+   	   public class ResourceNotFoundException extends RuntimeException {
+	    public ResourceNotFoundException(String message) {
+	        super(message);
+	    }
+		}
+   	   ```
+   	- Create the Global Exception Handler
+   	  ```java
+   	  @ControllerAdvice
+		public class GlobalExceptionHandler {
+	
+	    @ExceptionHandler(ResourceNotFoundException.class)
+	    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+	        ErrorResponse error = new ErrorResponse();
+	        error.setMessage(ex.getMessage());
+	        error.setTimestamp(LocalDateTime.now().toString());
+	        error.setStatus(HttpStatus.NOT_FOUND.value());
+	
+	        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+	    }
+	
+	    @ExceptionHandler(Exception.class)
+	    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+	        ErrorResponse error = new ErrorResponse();
+	        error.setMessage("Internal Server Error");
+	        error.setTimestamp(LocalDateTime.now().toString());
+	        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+	
+	        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+		}
+   	  ```
+   	  - Throw the Exception in Any Class
+   	    ```java
+   	    @GetMapping("/users/{id}")
+		public User getUser(@PathVariable int id) {
+		    User user = userService.findById(id);
+		    if (user == null) {
+		        throw new ResourceNotFoundException("User not found with ID: " + id);
+		    }
+		    return user;
+		}
+   	    ```
+   	  - @ControllerAdvice	Automatically intercepts exceptions thrown in controllers
+	  - @ExceptionHandler	Handles specific exception types
+## Request-Validation
+- Create a DTO with Validation Annotations
+  ```java
+	import jakarta.validation.constraints.NotBlank;
+	import jakarta.validation.constraints.Email;
+	import jakarta.validation.constraints.Size;
+	
+	public class UserRequest {
+	
+	    @NotBlank(message = "Name is required")
+	    private String name;
+	
+	    @Email(message = "Email should be valid")
+	    private String email;
+	
+	    @Size(min = 6, message = "Password must be at least 6 characters")
+	    private String password;
+	
+	    // Getters and setters
+	}
+  ```
+- Use @Valid in the Controller
+  ```java
+    import org.springframework.web.bind.annotation.*;
+	import org.springframework.http.ResponseEntity;
+	import jakarta.validation.Valid;
+	
+	@RestController
+	@RequestMapping("/api/users")
+	public class UserController {
+	
+	    @PostMapping
+	    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {
+	        // If validation passes, proceed
+	        return ResponseEntity.ok("User created successfully");
+	    }
+	}
+  ```
+- Handle Validation Errors (Optional but Recommended)
+	```java
+	@ControllerAdvice
+	public class ValidationExceptionHandler {
+	
+	    @ExceptionHandler(MethodArgumentNotValidException.class)
+	    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+	        Map<String, String> errors = new HashMap<>();
+	        ex.getBindingResult().getFieldErrors().forEach(error ->
+	            errors.put(error.getField(), error.getDefaultMessage())
+	        );
+	        return ResponseEntity.badRequest().body(errors);
+	    }
+	}
+	
+	```
+- Common Validation Annotations
+  ```java
+	- @NotNull	//Field must not be null
+	- @NotBlank	//Field must not be empty or blank
+	- @Size(min, max)	//String/collection size limits
+	- @Email	//Valid email format
+	- @Pattern	//Regex-based validation
+	- @Min, @Max	//Numeric range
+  ```
+## Custom-HTTP-Status
+- Create a Custom Exception Class
+  ```java
+	  public class ResourceNotFoundException extends RuntimeException {
+	    public ResourceNotFoundException(String message) {
+	        super(message);
+	    }
+	}
+  ```
+- Create a Global Exception Handler
+  ```java
+    import org.springframework.http.HttpStatus;
+	import org.springframework.http.ResponseEntity;
+	import org.springframework.web.bind.annotation.ControllerAdvice;
+	import org.springframework.web.bind.annotation.ExceptionHandler;
+	
+	@ControllerAdvice
+	public class GlobalExceptionHandler {
+	
+	    @ExceptionHandler(ResourceNotFoundException.class)
+	    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+	        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+	        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+	    }
+	
+	    // You can add more handlers for other exceptions
+	}
+  ```
+- Create an Error Response DTO
+  ```java
+	  public class ErrorResponse {
+	    private int status;
+	    private String message;
+	
+	    public ErrorResponse(int status, String message) {
+	        this.status = status;
+	        this.message = message;
+	    }
+	
+	    // Getters and setters
+	}
+  ```
+- Throw the Custom Exception in Your Controller or Service
+	 ```java
+	@GetMapping("/items/{id}")
+	public Item getItem(@PathVariable Long id) {
+	    return itemRepository.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
+	}
+	```
+  - You can create other exception classes like:
+    - BadRequestException → HttpStatus.BAD_REQUEST
+	- UnauthorizedException → HttpStatus.UNAUTHORIZED
+	- ConflictException → HttpStatus.CONFLICT
 ```TODO
 SPRING SECURITY
 https://www.youtube.com/watch?v=GH7L4D8Q_ak&list=PLxhSr_SLdXGOpdX60nHze41CvExvBOn09&index=10
