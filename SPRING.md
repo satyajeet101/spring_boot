@@ -216,8 +216,23 @@ with Spring security we can manage
 - @Cacheable on method need to be cached
 - we can custmize cache behaviour using @CacheEvict and @CachePut
 - chose cache provide like(EhCache or HazelCast) or use default concurant map based cache provided by spring-boot-starter-cache
-## PACT
 ## CDC
+- Consumer Driven Contract
+- A testing approach where the consumer of a service defines the expectations of the API contract (request & response).
+- The provider (the microservice exposing the API) must then honor that contract.
+## PACT
+- Pact is a tool/framework that implements CDC testing.
+- It allows consumers and providers to share API contracts and verify them automatically.
+- How it works (simplified flow):
+	- Consumer side:
+ 		- Consumer writes tests using Pact DSL to define the expected request/response.
+   		- Pact generates a contract file (JSON).
+     	- Contract sharing:
+      	- The contract file is published to a Pact Broker (a central repo for contracts).
+    - Provider side:
+    	- Provider runs Pact verification tests against its API implementation.
+     	- If provider API matches the contract → ✅
+      	- If provider changed something unexpectedly → ❌ Test fails.
 ## Exceptions-Handling
 - Best Practices:
 	- Use appropriate HTTP status codes (400, 404, 500, etc.)
