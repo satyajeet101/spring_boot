@@ -51,7 +51,7 @@
     - @Primary on one bean to make it as default injection
 - @ControllerAdvice to mark any class global exception handler
 	- @ExceptionHandler // to mark the method as exception handler class in global exception handler class
-- @Valid Input validation@NotBlank(message = "Name is required") private String name;
+- @Valid Input validation
 	- public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {} 	
 	- @Email(message = "Email should be valid") private String email;
 	- @Size(min = 6, message = "Password must be at least 6 characters") private String password;
