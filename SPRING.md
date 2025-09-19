@@ -298,6 +298,13 @@ with Spring security we can manage
    	  - @ControllerAdvice	Automatically intercepts exceptions thrown in controllers
 	  - @ExceptionHandler	Handles specific exception types
 ## Request-Validation
+- Add dependency
+  ```pom
+	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-validation</artifactId>
+	</dependency>
+  ```
 - Create a DTO with Validation Annotations
   ```java
 	import jakarta.validation.constraints.NotBlank;
