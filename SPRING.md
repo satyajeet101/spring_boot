@@ -57,6 +57,7 @@
 	- @Size(min = 6, message = "Password must be at least 6 characters") private String password;
  	- @NotBlank(message = "Name is required")
   	- @Pattern(regexp = "^[a-zA-Z0-9]{5,15}$", message = "Username must be alphanumeric and 5 to 15 characters long")
+  	- Make sure your class is annotated with @Validated if you're using it in a service layer
  
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
