@@ -55,7 +55,9 @@
 	- public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {} 	
 	- @Email(message = "Email should be valid") private String email;
 	- @Size(min = 6, message = "Password must be at least 6 characters") private String password;
- 	- @NotBlank(message = "Name is required") 
+ 	- @NotBlank(message = "Name is required")
+  	- @Pattern(regexp = "^[a-zA-Z0-9]{5,15}$", message = "Username must be alphanumeric and 5 to 15 characters long")
+ 
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
 
