@@ -36,7 +36,7 @@
   - @Value("${my.name: default value}")
   - @Value("some static message") private String str;
   - @Value("${my.values}") private List<String>listValue
-- @ConfigurationProperties("db") // anything starting with db like db.host, db.name 
+- @ConfigurationProperties(prefix = "db") // put this on class and and that class property will be bind by db.propName in property file 
   will be assigned to respective property of the class
 - @SpringBootTest integration testing and it sets the spring context
 - @MockBean create a fake bean during unit testing
