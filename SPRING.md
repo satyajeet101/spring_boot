@@ -130,12 +130,12 @@ Movie movie = builder.build()
 #### Server Configuration
    - Add @EnableEurekaServer in app class
    - Add pom dependency
-        ```json
+        ```xml
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         ```
    - Add property
-       ```json
+       ```properties
          server.port=8761
          eureka.client.register-with-eureka=false
          eureka.client.fetch-registry=false
