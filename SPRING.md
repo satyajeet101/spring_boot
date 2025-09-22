@@ -4,8 +4,8 @@
 [Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
 [Issues With Microservices](#Issues-With-Microservices) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) | 
-[Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status)
-
+[Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) | 
+[Runtime Load](#Runtime-Load)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
@@ -36,8 +36,10 @@
   - @Value("${my.name: default value}")
   - @Value("some static message") private String str;
   - @Value("${my.values}") private List<String>listValue
-- @ConfigurationProperties(prefix = "db") // put this on class and and that class property will be bind by db.propName in property file 
-  will be assigned to respective property of the class
+- @ConfigurationProperties("db")
+  - put this on class and that class property will be bind by db.propName in property file 
+    will be assigned to respective property of the class
+  - If Propert name is "driverClassName" then in propert file it should be "db.driver-class-name"
 - @SpringBootTest integration testing and it sets the spring context
 - @MockBean create a fake bean during unit testing
 - @Transactional
@@ -421,6 +423,152 @@ with Spring security we can manage
     - BadRequestException → HttpStatus.BAD_REQUEST
 	- UnauthorizedException → HttpStatus.UNAUTHORIZED
 	- ConflictException → HttpStatus.CONFLICT
+## DataBase-Configuration
+1. Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+    </dependency>
+```
+2. Add below in property file
+```properties
+    spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=yourDB
+    spring.datasource.username=yourUsername
+    spring.datasource.password=yourPassword
+    spring.datasource.driver-class-name=com.sqlserver.jdbc.SQLServerDriver
+    spring.jpa.hibernate.ddl-auto=update
+    spring.jpa.show-sql=true
+```
+- Spring Boot's auto-configuration mechanism uses DataSourceProperties (A JPA class) to configure and create a DataSource bean based on the provided properties, simplifying data source setup.
+- Customization and Multiple Data Sources: 
+  - While auto-configuration is convenient for single data source scenarios, we can create custom DataSourceProperties instances for more advanced configurations, including setting up multiple data sources with distinct properties.
+    - Example
+      - Create configuration for the primary data source
+      ```java
+      @Configuration
+      @EnableTransactionManagement
+      @EnableJpaRepositories(
+        basePackages = "com.example.repository.primary",
+        entityManagerFactoryRef = "primaryEntityManagerFactory",
+        transactionManagerRef = "primaryTransactionManager"
+        )
+      public class PrimaryDataSourceConfig {
+          @Bean
+          @ConfigurationProperties("spring.datasource.sqlserver")
+          public DataSourceProperties primaryDataSourceProperties() {
+              return new DataSourceProperties();
+          }
+          @Bean
+          public DataSource primaryDataSource() {
+              return primaryDataSourceProperties().initializeDataSourceBuilder().build();
+          }
+          @Bean
+          public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
+                  EntityManagerFactoryBuilder builder) {
+              return builder
+                      .dataSource(primaryDataSource())
+                      .packages("com.example.model.primary")
+                      .build();
+          }
+          @Bean
+          public PlatformTransactionManager primaryTransactionManager(
+                  @Qualifier("primaryEntityManagerFactory") EntityManagerFactory emf) {
+              return new JpaTransactionManager(emf);
+          }
+        }
+```
+3. Create entity class and annotate with @Entity 
+4. Create repo interface and extend with JpaRepository<Entity, primary key type>
+
+## Runtime-Load
+### Option 1: Using CommandLineRunner
+- Implement CommandLineRunner interface in your main application class or any @Component class.
+- Override the run(String... args) method to include your startup logic.
+- The run method will be executed after the application context is loaded and right before the Spring Boot application starts.
+```java
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;    
+@Component
+public class MyStartupRunner implements CommandLineRunner {
+    @Override
+    public void run(String... args) throws Exception {
+        // Your startup logic here
+        System.out.println("Application started with command-line arguments: " + Arrays.toString(args));
+        // You can perform tasks like loading initial data, setting up resources, etc.
+    }
+}   
+```
+### Option 2: Using ApplicationRunner
+- Similar to CommandLineRunner, but provides access to ApplicationArguments which can be more convenient for parsing command-line arguments.
+- Implement ApplicationRunner interface in your main application class or any @Component class.
+- Override the run(ApplicationArguments args) method to include your startup logic.
+```java
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;    
+@Component
+public class MyAppStartupRunner implements ApplicationRunner {
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // Your startup logic here
+        System.out.println("Application started with option names: " + args.getOptionNames());
+        // You can perform tasks like loading initial data, setting up resources, etc.
+    }
+}
+```
+- To Use Application Arguments
+  - java -jar yourapp.jar --option1=value1 --option2=value2
+  - Access in run method using args.getOptionValues("option1")
+  - args.getNonOptionArgs() for non-option arguments
+  - args.containsOption("option1") to check if an option is present
+  - args.getOptionNames() to get all option names
+  - args.getSourceArgs() to get raw arguments array
+  - args.getOptionValues("option1") to get values for a specific option
+
+### Option 3: Using @PostConstruct
+- Annotate a method with @PostConstruct in any @Component or @Service class.
+- The method will be executed after the bean's properties have been set and before the bean is put into service.
+```java
+import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;    
+@Component
+public class MyBean {
+    @PostConstruct
+    public void init() {
+        // Your initialization logic here
+        System.out.println("Bean is initialized and ready to use.");
+        // You can perform tasks like loading initial data, setting up resources, etc.
+    }
+}   
+```
+### Option 4: Using ApplicationListener<ApplicationReadyEvent>
+- Implement ApplicationListener<ApplicationReadyEvent> interface in your main application class or any @Component class.
+- Override the onApplicationEvent(ApplicationReadyEvent event) method to include your startup logic.
+- The method will be executed when the application is fully started and ready to service requests.
+- This is useful for tasks that should only run after the application is completely up and running.
+```java
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;    
+@Component
+public class MyAppReadyListener implements ApplicationListener<ApplicationReadyEvent> {
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        // Your startup logic here
+        System.out.println("Application is ready to service requests.");
+        // You can perform tasks like loading initial data, setting up resources, etc.
+    }
+}
+```
+
+
+
+
 ```TODO
 SPRING SECURITY
 https://www.youtube.com/watch?v=GH7L4D8Q_ak&list=PLxhSr_SLdXGOpdX60nHze41CvExvBOn09&index=10
