@@ -481,7 +481,7 @@ with Spring security we can manage
               return new JpaTransactionManager(emf);
           }
         }
-```
+	```
 3. Create entity class and annotate with @Entity 
 4. Create repo interface and extend with JpaRepository<Entity, primary key type>
 
