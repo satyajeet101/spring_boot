@@ -6,7 +6,7 @@
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) |
 [Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) |
 [Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) | 
-[Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Chaching](#Chaching)
+[Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Caching](#Caching)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
