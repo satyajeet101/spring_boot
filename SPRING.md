@@ -6,7 +6,7 @@
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) |
 [Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) |
 [Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) | 
-[Spring WebFlux](#Spring-WebFlux) | [Log](#Log)
+[Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Chaching](#Chaching)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
@@ -878,7 +878,75 @@ public class LoggingAspect {
     - FATAL
     - OFF
 
-    
+## Caching
+### In memory Caching
+1. Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>   
+```
+2. Enable caching in main class @EnableCaching
+3. Add @Cacheable to method need to be cached
+```java
+    @Cacheable(value = "items", key = "#id")
+    public Item getItemById(Long id) {
+        // Simulate a slow service call
+        try {
+            Thread.sleep(3000); // 3 seconds delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return itemRepository.findById(id).orElse(null);
+    }
+```
+4. Add @CacheEvict to method need to clear cache
+```java
+    @CacheEvict(value = "items", key = "#id")
+    public void deleteItem(Long id) {
+        itemRepository.deleteById(id);
+    }
+```
+5. Add @CachePut to method need to update cache
+```java
+    @CachePut(value = "items", key = "#item.id")
+    public Item updateItem(Item item) {
+        return itemRepository.save(item);   
+    }
+```
+- By default it uses ConcurrentMapCacheManager which is not suitable for production
+- You can use other cache providers like EhCache, Hazelcast, Caffeine, Redis etc.
+### Redis Caching
+1. Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+```
+2. Add below in prop file
+```properties
+    spring.cache.type=redis 
+    spring.redis.host=localhost
+    spring.redis.port=6379
+```
+3. Enable caching in main class @EnableCaching
+4. Add @Cacheable, @CacheEvict, @CachePut to method need to be cached/evicted/updated
+5. By default it uses StringRedisSerializer for key and JdkSerializationRedisSerializer for value
+6. You can customize it by creating a bean of RedisCacheConfiguration
+```java
+    @Bean
+    public RedisCacheConfiguration cacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10)) // Set TTL for cache entries
+                .disableCachingNullValues()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+    }
+```
+
+
 ```TODO
 SPRING SECURITY
 https://www.youtube.com/watch?v=GH7L4D8Q_ak&list=PLxhSr_SLdXGOpdX60nHze41CvExvBOn09&index=10
