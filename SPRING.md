@@ -6,7 +6,7 @@
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) |
 [Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) |
 [Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) | 
-[Spring WebFlux](#Spring-WebFlux)
+[Spring WebFlux](#Spring-WebFlux) | [Log](#Log)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
@@ -800,10 +800,85 @@ public class LoggingAspect {
 
 ## Spring-WebFlux
 
+## Log
+- Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-logging</artifactId>
+    </dependency>
+```
+- Default logging framework is Logback
+- Default log file name is spring.log
+- To change log file name add below in prop file
+```properties
+    logging.file.name=app.log   
+    logging.file.path=/var/logs
+```
+- To change log pattern add below in prop file
+    ```properties
+        logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+        logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n    
+    ```
+- To change log level add below in prop file
+```properties
+    logging.level.root=INFO
+    logging.level.org.springframework.web=DEBUG
+    logging.level.com.example=TRACE
+```
+- To use in code
+```java
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    public class MyService {
+        private static final Logger logger = LoggerFactory.getLogger(MyService.class);
+    
+        public void performTask() {
+            logger.info("Task started");
+            try {
+                // Task logic here
+                logger.debug("Performing task step 1");
+                // More logic
+                logger.debug("Performing task step 2");
+            } catch (Exception e) {
+                logger.error("Error occurred while performing task", e);
+            }
+            logger.info("Task completed");
+        }
+    }
+```
 
+- Using through Lombook dependency by annotation @Slf4j
 
+```java
+    import lombok.extern.slf4j.Slf4j;
+    @Slf4j
+    public class MyService {
+    
+        public void performTask() {
+            log.info("Task started");
+            try {
+                // Task logic here
+                log.debug("Performing task step 1");
+                // More logic
+                log.debug("Performing task step 2");
+            } catch (Exception e) {
+                log.error("Error occurred while performing task", e);
+            }
+            log.info("Task completed");
+        }
+    }   
+```
+- Different log level
+    - TRACE
+    - DEBUG
+    - INFO
+    - WARN
+    - ERROR
+    - FATAL
+    - OFF
 
-
+    
 ```TODO
 SPRING SECURITY
 https://www.youtube.com/watch?v=GH7L4D8Q_ak&list=PLxhSr_SLdXGOpdX60nHze41CvExvBOn09&index=10
