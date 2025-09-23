@@ -1,11 +1,12 @@
 
 # Contents
 [Common Annotations](#Annotations) | [Microservice vs service oriented architectures (SOA)](#Microservice-vs-service-oriented-architectures-SOA) |
-[Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) | 
-[Issues With Microservices](#Issues-With-Microservices) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) | 
-[Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) | 
-[Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) | 
-[Runtime Load](#Runtime-Load)
+[Profile](#Profile) | [Spring Cloud Config Server](#Spring-cloud-config-server) | [RestTemplate](#RestTemplate) | [WebClient](#WebClient) | [Service Discovery](#Service-Discovery) |
+[Issues With Microservices](#Issues-With-Microservices) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) |
+[Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) |
+[Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) |
+[Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) | 
+[Spring WebFlux](#Spring-WebFlux)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
@@ -20,47 +21,47 @@
     - Returns http response
 - @RequestMapping("/api")
 - In case of query param
-	- @GetMapping("/users")
-	    - (@RequestParam String name)
-	    - (@RequestParam(required = false, defaultValue = "Guest") String name)
+    - @GetMapping("/users")
+        - (@RequestParam String name)
+        - (@RequestParam(required = false, defaultValue = "Guest") String name)
 - In case of path param
-	- @GetMapping("/users/{id}")
-    	- public String getUserById(@PathVariable int id)
+    - @GetMapping("/users/{id}")
+        - public String getUserById(@PathVariable int id)
 - @PostMapping("user")
     - (@RequestBody User user){}
 - @Entity
     - @Id
     - @GeneratedValue(strategy = GenerationType.IDENTITY)
 - @Value
-  - @Value("${my.name}")
-  - @Value("${my.name: default value}")
-  - @Value("some static message") private String str;
-  - @Value("${my.values}") private List<String>listValue
+    - @Value("${my.name}")
+    - @Value("${my.name: default value}")
+    - @Value("some static message") private String str;
+    - @Value("${my.values}") private List<String>listValue
 - @ConfigurationProperties("db")
-  - put this on class and that class property will be bind by db.propName in property file 
-    will be assigned to respective property of the class
-  - If Propert name is "driverClassName" then in propert file it should be "db.driver-class-name"
+    - put this on class and that class property will be bind by db.propName in property file
+      will be assigned to respective property of the class
+    - If Propert name is "driverClassName" then in propert file it should be "db.driver-class-name"
 - @SpringBootTest integration testing and it sets the spring context
 - @MockBean create a fake bean during unit testing
 - @Transactional
 - Acync operation
-	- add @Async on method
-	- @EnableAsync by adding in config class
+    - add @Async on method
+    - @EnableAsync by adding in config class
 - @Qualifier("beanName") to mark which bean to inject
     - When you have multiple beans of the same type.
     - Often used in multi-implementation scenarios
     - When you want fine-grained control over which bean to inject.
     - @Primary on one bean to make it as default injection
 - @ControllerAdvice to mark any class global exception handler
-	- @ExceptionHandler // to mark the method as exception handler class in global exception handler class
+    - @ExceptionHandler // to mark the method as exception handler class in global exception handler class
 - @Valid Input validation
-	- public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {} 	
-	- @Email(message = "Email should be valid") private String email;
-	- @Size(min = 6, message = "Password must be at least 6 characters") private String password;
- 	- @NotBlank(message = "Name is required")
-  	- @Pattern(regexp = "^[a-zA-Z0-9]{5,15}$", message = "Username must be alphanumeric and 5 to 15 characters long")
-  	- Make sure your class is annotated with @Validated if you're using it in a service layer
- 
+    - public ResponseEntity<String> createUser(@RequestBody @Valid UserRequest userRequest) {}
+    - @Email(message = "Email should be valid") private String email;
+    - @Size(min = 6, message = "Password must be at least 6 characters") private String password;
+    - @NotBlank(message = "Name is required")
+        - @Pattern(regexp = "^[a-zA-Z0-9]{5,15}$", message = "Username must be alphanumeric and 5 to 15 characters long")
+        - Make sure your class is annotated with @Validated if you're using it in a service layer
+
 ## Microservice-vs-service-oriented-architectures-SOA
 SOA is an older architecture style where services are typically larger, coarse-grained, and rely on a central Enterprise Service Bus (ESB) for communication and orchestration. This often leads to bottlenecks and tighter coupling.
 
@@ -72,31 +73,31 @@ In short: SOA = centralized, coarse-grained, ESB-driven; Microservices = decentr
 ## Profile
 - Default profile is always active
 - Naming
-  - application-<profile name>.extn
+    - application-<profile name>.extn
 - In prop file, Add
-  - spring.profile.active: profile name
-- We can also select which bean to load during startup 
-  - @Profile("profile name") 
+    - spring.profile.active: profile name
+- We can also select which bean to load during startup
+    - @Profile("profile name")
 ## Spring-cloud-config-server
-- Create a Spring project with dependency 
-  - spring-cloud-config-server
-- Add 
-  - @EnableConfigServer to main class
+- Create a Spring project with dependency
+    - spring-cloud-config-server
+- Add
+    - @EnableConfigServer to main class
 - In prop file add
-  - spring.cloud.config.server.git.url = github path wher we maintain config
+    - spring.cloud.config.server.git.url = github path wher we maintain config
 - Now its ready at
-  - localhost:port/application/profileName
+    - localhost:port/application/profileName
 - Now to use this config server in any project
-  - Add client dependency
-    - spring-cloud-starter-config
-  - In prop file
-    - spring.cloud.config.uri= localhost:port
-  - Now all the prop in files will be updated with the value from config server
+    - Add client dependency
+        - spring-cloud-starter-config
+    - In prop file
+        - spring.cloud.config.uri= localhost:port
+    - Now all the prop in files will be updated with the value from config server
 - Now the app is associated with prop file only during startup so to read the latest config
-  - Add actuator dependency to use one of its endpoint
-  - Add @RefreshScope to the property we need to update
-  - Call /actuator/refresh end point
-  - here you go you got your prop updated 
+    - Add actuator dependency to use one of its endpoint
+    - Add @RefreshScope to the property we need to update
+    - Call /actuator/refresh end point
+    - here you go you got your prop updated
 ## RestTemplate
 - By default, available with spring boot web
 - It is synchronous by default.
@@ -117,9 +118,9 @@ Movie movie = builder.build()
         .block();
 ```
 ### Note
-- .bodyToMono() → for a single object. 
-- .bodyToFlux() → for a list/stream of objects. 
-- You can add .onStatus() to handle error responses gracefully. 
+- .bodyToMono() → for a single object.
+- .bodyToFlux() → for a list/stream of objects.
+- You can add .onStatus() to handle error responses gracefully.
 - You can also set headers (like auth tokens) with .header("Authorization", "Bearer xyz").
 ## Service-Discovery
 ### Client Side
@@ -128,25 +129,25 @@ Movie movie = builder.build()
 ![serverSideDiscovery.png](assets%2FserverSideDiscovery.png)
 ### Eureka Configuration
 #### Server Configuration
-   - Add @EnableEurekaServer in app class
-   - Add pom dependency
-        ```xml
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-        ```
-   - Add property
-       ```properties
-         server.port=8761
-         eureka.client.register-with-eureka=false
-         eureka.client.fetch-registry=false
-        ```
+- Add @EnableEurekaServer in app class
+- Add pom dependency
+     ```xml
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+     ```
+- Add property
+    ```properties
+      server.port=8761
+      eureka.client.register-with-eureka=false
+      eureka.client.fetch-registry=false
+     ```
 ![runningEureka.png](assets%2FrunningEureka.png)
 #### Client configuration
-   - @EnableEurekaClient,  with newer version not mandatory for client
-   - If server is running on default port no need any prop in property file 
-     else we have to add below in prop file
-     - spring.application.name=movie-service
-     - eureka.client.service-url.defaultZone=http://localhost:9090/eureka/
+- @EnableEurekaClient,  with newer version not mandatory for client
+- If server is running on default port no need any prop in property file
+  else we have to add below in prop file
+    - spring.application.name=movie-service
+    - eureka.client.service-url.defaultZone=http://localhost:9090/eureka/
 #### Calling
 ```java
     @Bean
@@ -163,18 +164,18 @@ Movie movie = builder.build()
 ## Hystrix
 1. Add maven dep
 2. Add annotation in spring class @EnableCircuitBreaker
-3. Add Hystrix command to method which want to enable hystrix 
+3. Add Hystrix command to method which want to enable hystrix
    @HystrixCommand(fallbacMethod="methodName")
-4. Configure behavior 
-![hystrixParam.png](assets%2FhystrixParam.png)
-#### NOTE: 
+4. Configure behavior
+   ![hystrixParam.png](assets%2FhystrixParam.png)
+#### NOTE:
 with latest version of spring cloud Hystrix is not supported in that case you have to use
 <dependency>
 <groupId>org.springframework.cloud</groupId>
 <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
 </dependency>
 ## BulkHead-Pattern
-The Bulkhead Pattern is a resilience pattern that isolates resources (like threads, memory, or connection pools) 
+The Bulkhead Pattern is a resilience pattern that isolates resources (like threads, memory, or connection pools)
 for different parts of a system, so that a failure in one area does not bring down the entire system.
 ![bulkHead.png](assets%2FbulkHead.png)
 ## Virtual-vs-Platform-Threads
@@ -206,10 +207,10 @@ with Spring security we can manage
 - Authentication (Who the user is)
 - Authorization (What User can access)
 - with combination of
-  - Password encoding
-  - Role based access control
-  - session management
-  - OAuth2, JWT, and more
+    - Password encoding
+    - Role based access control
+    - session management
+    - OAuth2, JWT, and more
 ### Steps
 - Add spring security in pom, it will enable the form login by default
 - Create a configuration class 	@Configuration @EnableWebsucrity
@@ -218,7 +219,7 @@ with Spring security we can manage
 - Create encoder	public PasswordEncoder passwordEncoder(){return new BcryptPasswordEncoder();}
 - Add below annotation to endpoint in controller @PreAuthorize("hasRole('USER')")
 ## Multi-data-source
-- in prop file enter detail for read and write both 
+- in prop file enter detail for read and write both
 - no create 2 diff repo for read na write
 - @JdbcRepository(dataSource = "read") or  @JdbcRepository(dataSource = "write") //whatevr source name you have given in prop file
 - inject what ever you need
@@ -236,69 +237,69 @@ with Spring security we can manage
 - Pact is a tool/framework that implements CDC testing.
 - It allows consumers and providers to share API contracts and verify them automatically.
 - How it works (simplified flow):
-	- Consumer side:
- 		- Consumer writes tests using Pact DSL to define the expected request/response.
-   		- Pact generates a contract file (JSON).
-     	- Contract sharing:
-      	- The contract file is published to a Pact Broker (a central repo for contracts).
+    - Consumer side:
+        - Consumer writes tests using Pact DSL to define the expected request/response.
+        - Pact generates a contract file (JSON).
+        - Contract sharing:
+            - The contract file is published to a Pact Broker (a central repo for contracts).
     - Provider side:
-    	- Provider runs Pact verification tests against its API implementation.
-     	- If provider API matches the contract → ✅
-      	- If provider changed something unexpectedly → ❌ Test fails.
+        - Provider runs Pact verification tests against its API implementation.
+        - If provider API matches the contract → ✅
+            - If provider changed something unexpectedly → ❌ Test fails.
 ## Exceptions-Handling
 - Best Practices:
-	- Use appropriate HTTP status codes (400, 404, 500, etc.)
-	- Return a structured JSON error response
-	- Log the error for debugging
-	- Avoid exposing sensitive internal details
- - Using @ControllerAdvice for Global Exception Handling
-   	- Define a Custom Exception
-   	  	```java
-   	   public class ResourceNotFoundException extends RuntimeException {
-	    public ResourceNotFoundException(String message) {
-	        super(message);
-	    }
-		}
-   	   ```
-   	- Create the Global Exception Handler
-   	  ```java
-   	  @ControllerAdvice
-		public class GlobalExceptionHandler {
-	
-	    @ExceptionHandler(ResourceNotFoundException.class)
-	    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
-	        ErrorResponse error = new ErrorResponse();
-	        error.setMessage(ex.getMessage());
-	        error.setTimestamp(LocalDateTime.now().toString());
-	        error.setStatus(HttpStatus.NOT_FOUND.value());
-	
-	        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-	    }
-	
-	    @ExceptionHandler(Exception.class)
-	    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-	        ErrorResponse error = new ErrorResponse();
-	        error.setMessage("Internal Server Error");
-	        error.setTimestamp(LocalDateTime.now().toString());
-	        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-	
-	        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
-		}
-   	  ```
-   	  - Throw the Exception in Any Class
-   	    ```java
-   	    @GetMapping("/users/{id}")
-		public User getUser(@PathVariable int id) {
-		    User user = userService.findById(id);
-		    if (user == null) {
-		        throw new ResourceNotFoundException("User not found with ID: " + id);
-		    }
-		    return user;
-		}
-   	    ```
-   	  - @ControllerAdvice	Automatically intercepts exceptions thrown in controllers
-	  - @ExceptionHandler	Handles specific exception types
+    - Use appropriate HTTP status codes (400, 404, 500, etc.)
+    - Return a structured JSON error response
+    - Log the error for debugging
+    - Avoid exposing sensitive internal details
+- Using @ControllerAdvice for Global Exception Handling
+  - Define a Custom Exception
+  ```java
+public class ResourceNotFoundException extends RuntimeException {
+public ResourceNotFoundException(String message) {
+ super(message);
+}
+}
+```
+  - Create the Global Exception Handler
+  ```java
+  @ControllerAdvice
+  public class GlobalExceptionHandler {
+
+      @ExceptionHandler(ResourceNotFoundException.class)
+      public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+          ErrorResponse error = new ErrorResponse();
+          error.setMessage(ex.getMessage());
+          error.setTimestamp(LocalDateTime.now().toString());
+          error.setStatus(HttpStatus.NOT_FOUND.value());
+
+          return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+      }
+
+      @ExceptionHandler(Exception.class)
+      public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+          ErrorResponse error = new ErrorResponse();
+          error.setMessage("Internal Server Error");
+          error.setTimestamp(LocalDateTime.now().toString());
+          error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+          return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+  	}
+  	  ```
+  	  - Throw the Exception in Any Class
+  	    ```java
+  	    @GetMapping("/users/{id}")
+  	public User getUser(@PathVariable int id) {
+  	    User user = userService.findById(id);
+  	    if (user == null) {
+  	        throw new ResourceNotFoundException("User not found with ID: " + id);
+  	    }
+  	    return user;
+  	}
+  	    ```
+  	  - @ControllerAdvice	Automatically intercepts exceptions thrown in controllers
+    - @ExceptionHandler	Handles specific exception types
 ## Request-Validation
 - Add dependency
   ```pom
@@ -345,21 +346,21 @@ with Spring security we can manage
 	}
   ```
 - Handle Validation Errors (Optional but Recommended)
-	```java
-	@ControllerAdvice
-	public class ValidationExceptionHandler {
-	
-	    @ExceptionHandler(MethodArgumentNotValidException.class)
-	    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
-	        Map<String, String> errors = new HashMap<>();
-	        ex.getBindingResult().getFieldErrors().forEach(error ->
-	            errors.put(error.getField(), error.getDefaultMessage())
-	        );
-	        return ResponseEntity.badRequest().body(errors);
-	    }
-	}
-	
-	```
+  ```java
+  @ControllerAdvice
+  public class ValidationExceptionHandler {
+  
+      @ExceptionHandler(MethodArgumentNotValidException.class)
+      public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+          Map<String, String> errors = new HashMap<>();
+          ex.getBindingResult().getFieldErrors().forEach(error ->
+              errors.put(error.getField(), error.getDefaultMessage())
+          );
+          return ResponseEntity.badRequest().body(errors);
+      }
+  }
+  
+  ```
 - Common Validation Annotations
   ```java
 	- @NotNull	//Field must not be null
@@ -412,17 +413,17 @@ with Spring security we can manage
 	}
   ```
 - Throw the Custom Exception in Your Controller or Service
-	 ```java
-	@GetMapping("/items/{id}")
-	public Item getItem(@PathVariable Long id) {
-	    return itemRepository.findById(id)
-	        .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
-	}
-	```
-  - You can create other exception classes like:
-    - BadRequestException → HttpStatus.BAD_REQUEST
-	- UnauthorizedException → HttpStatus.UNAUTHORIZED
-	- ConflictException → HttpStatus.CONFLICT
+   ```java
+  @GetMapping("/items/{id}")
+  public Item getItem(@PathVariable Long id) {
+      return itemRepository.findById(id)
+          .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
+  }
+  ```
+    - You can create other exception classes like:
+        - BadRequestException → HttpStatus.BAD_REQUEST
+        - UnauthorizedException → HttpStatus.UNAUTHORIZED
+        - ConflictException → HttpStatus.CONFLICT
 ## DataBase-Configuration
 1. Add dependency
 ```xml
@@ -445,44 +446,44 @@ with Spring security we can manage
     spring.jpa.show-sql=true
 ```
 - Spring Boot's auto-configuration mechanism uses DataSourceProperties (A JPA class) to configure and create a DataSource bean based on the provided properties, simplifying data source setup.
-- Customization and Multiple Data Sources: 
-  - While auto-configuration is convenient for single data source scenarios, we can create custom DataSourceProperties instances for more advanced configurations, including setting up multiple data sources with distinct properties.
-    - Example
-      - Create configuration for the primary data source
-      ```java
-      @Configuration
-      @EnableTransactionManagement
-      @EnableJpaRepositories(
-        basePackages = "com.example.repository.primary",
-        entityManagerFactoryRef = "primaryEntityManagerFactory",
-        transactionManagerRef = "primaryTransactionManager"
-        )
-      public class PrimaryDataSourceConfig {
-          @Bean
-          @ConfigurationProperties("spring.datasource.sqlserver")
-          public DataSourceProperties primaryDataSourceProperties() {
-              return new DataSourceProperties();
-          }
-          @Bean
-          public DataSource primaryDataSource() {
-              return primaryDataSourceProperties().initializeDataSourceBuilder().build();
-          }
-          @Bean
-          public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
-                  EntityManagerFactoryBuilder builder) {
-              return builder
-                      .dataSource(primaryDataSource())
-                      .packages("com.example.model.primary")
-                      .build();
-          }
-          @Bean
-          public PlatformTransactionManager primaryTransactionManager(
-                  @Qualifier("primaryEntityManagerFactory") EntityManagerFactory emf) {
-              return new JpaTransactionManager(emf);
-          }
-        }
-      ```
-3. Create entity class and annotate with @Entity 
+- Customization and Multiple Data Sources:
+    - While auto-configuration is convenient for single data source scenarios, we can create custom DataSourceProperties instances for more advanced configurations, including setting up multiple data sources with distinct properties.
+        - Example
+            - Create configuration for the primary data source
+          ```java
+          @Configuration
+          @EnableTransactionManagement
+          @EnableJpaRepositories(
+            basePackages = "com.example.repository.primary",
+            entityManagerFactoryRef = "primaryEntityManagerFactory",
+            transactionManagerRef = "primaryTransactionManager"
+            )
+          public class PrimaryDataSourceConfig {
+              @Bean
+              @ConfigurationProperties("spring.datasource.sqlserver")
+              public DataSourceProperties primaryDataSourceProperties() {
+                  return new DataSourceProperties();
+              }
+              @Bean
+              public DataSource primaryDataSource() {
+                  return primaryDataSourceProperties().initializeDataSourceBuilder().build();
+              }
+              @Bean
+              public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
+                      EntityManagerFactoryBuilder builder) {
+                  return builder
+                          .dataSource(primaryDataSource())
+                          .packages("com.example.model.primary")
+                          .build();
+              }
+              @Bean
+              public PlatformTransactionManager primaryTransactionManager(
+                      @Qualifier("primaryEntityManagerFactory") EntityManagerFactory emf) {
+                  return new JpaTransactionManager(emf);
+              }
+            }
+          ```
+3. Create entity class and annotate with @Entity
 4. Create repo interface and extend with JpaRepository<Entity, primary key type>
 
 ## Runtime-Load
@@ -522,13 +523,13 @@ public class MyAppStartupRunner implements ApplicationRunner {
 }
 ```
 - To Use Application Arguments
-  - java -jar yourapp.jar --option1=value1 --option2=value2
-  - Access in run method using args.getOptionValues("option1")
-  - args.getNonOptionArgs() for non-option arguments
-  - args.containsOption("option1") to check if an option is present
-  - args.getOptionNames() to get all option names
-  - args.getSourceArgs() to get raw arguments array
-  - args.getOptionValues("option1") to get values for a specific option
+    - java -jar yourapp.jar --option1=value1 --option2=value2
+    - Access in run method using args.getOptionValues("option1")
+    - args.getNonOptionArgs() for non-option arguments
+    - args.containsOption("option1") to check if an option is present
+    - args.getOptionNames() to get all option names
+    - args.getSourceArgs() to get raw arguments array
+    - args.getOptionValues("option1") to get values for a specific option
 
 ### Option 3: Using @PostConstruct
 - Annotate a method with @PostConstruct in any @Component or @Service class.
@@ -565,6 +566,240 @@ public class MyAppReadyListener implements ApplicationListener<ApplicationReadyE
     }
 }
 ```
+## Transaction
+- Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+```
+- Add @EnableTransactionManagement in config class
+- Add @Transactional on method or class
+- By default, runtime exceptions trigger rollback, while checked exceptions do not.
+- You can customize rollback behavior using the rollbackFor and noRollbackFor attributes of @Transactional.
+
+### Declarative Transaction Management
+- Use @Transactional annotation on service methods or classes to manage transactions declaratively.
+- Spring automatically handles transaction begin, commit, and rollback based on method execution and exceptions.
+
+### Programmatic Transaction Management
+- Use PlatformTransactionManager and TransactionTemplate for fine-grained control over transactions in code.
+- Manually begin, commit, and rollback transactions as needed.
+```java
+@Autowired
+private PlatformTransactionManager transactionManager;
+public void performTransaction() {
+    TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+    try {
+        // Business logic here
+        transactionManager.commit(status);
+    } catch (Exception e) {
+        transactionManager.rollback(status);
+        throw e;
+    }
+}
+```
+
+### Transaction Propagation
+- Defines how transactions behave when calling methods that are already transactional.
+- Common propagation levels:
+    - REQUIRED (default): Join existing transaction or create a new one.
+    - REQUIRES_NEW: Suspend existing transaction and create a new one.
+    - SUPPORTS: Join existing transaction if present, otherwise execute non-transactionally.
+    - MANDATORY: Must join an existing transaction, otherwise throw an exception.
+    - NOT_SUPPORTED: Suspend existing transaction and execute non-transactionally.
+    - NEVER: Must execute non-transactionally, otherwise throw an exception.
+    - NESTED: Execute within a nested transaction if a current transaction exists.
+    - Example:
+```java
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void newTransactionMethod() {
+    // This method will always run in a new transaction
+}
+```
+
+### Isolation Levels
+- Defines the degree to which a transaction must be isolated from data modifications made by other transactions.
+- Common isolation levels:
+    - DEFAULT: Use the default isolation level of the underlying database.
+    - READ_UNCOMMITTED: Allows dirty reads, non-repeatable reads, and phantom reads.
+    - READ_COMMITTED: Prevents dirty reads, allows non-repeatable reads and phantom reads.
+    - REPEATABLE_READ: Prevents dirty reads and non-repeatable reads, allows phantom reads.
+    - SERIALIZABLE: Prevents dirty reads, non-repeatable reads, and phantom reads.
+    - Example:
+```java
+@Transactional(isolation = Isolation.SERIALIZABLE)
+public void serializableMethod() {
+    // This method will run with SERIALIZABLE isolation level
+}
+```
+### Rollback Rules
+- By default, Spring rolls back transactions for unchecked exceptions (subclasses of RuntimeException) and errors.
+- Checked exceptions (subclasses of Exception) do not trigger a rollback by default.
+- You can customize rollback behavior using the rollbackFor and noRollbackFor attributes of @Transactional.
+```java
+@Transactional(rollbackFor = {CustomCheckedException.class})
+public void methodWithCustomRollback() {
+    // This method will roll back for CustomCheckedException
+}
+``` 
+### Read-Only Transactions
+- Use readOnly = true attribute in @Transactional for methods that only read data and do not modify it.
+- This can help optimize performance by allowing the database to apply optimizations for read-only operations.
+```java
+@Transactional(readOnly = true)
+public List<Entity> fetchEntities() {
+    // This method is read-only
+}
+```
+
+## AOP
+- Aspect-Oriented Programming allows you to separate cross-cutting concerns (like logging, security, transactions) from your business logic. 
+- In Spring Boot, AOP is commonly used for:
+  - Logging
+  - Performance monitoring
+  - Security checks
+  - Exception handling
+### Key Concepts
+- Aspect: A modularization of a concern that cuts across multiple classes. It is a class that contains advice and pointcuts.
+- Join Point: A specific point in the execution of a program, such as method execution or exception handling.
+- Pointcut: A rule that selects which Join Points to apply logic to. It defines where advice should be applied.
+  - @Pointcut("within(com.example..*)") // all methods in com.example package
+  - @Pointcut("execution(* com.example.service.*.*(..))") // all methods in service package
+  - Why Use @Pointcut?
+    - Reusability: You can reference the same pointcut in multiple advices.
+    - Readability: Gives meaningful names to complex expressions.
+    - Maintainability: Easier to update one pointcut than multiple expressions.
+    - Example
+      ```java
+          import org.aspectj.lang.annotation.Aspect;
+          import org.aspectj.lang.annotation.Pointcut;
+          import org.aspectj.lang.annotation.Before;
+          import org.springframework.stereotype.Component;
+        
+          @Aspect
+          @Component
+          public class LoggingAspect {
+        
+              // Step 2: Define a reusable pointcut
+              @Pointcut("execution(* com.example.service.UserService.*(..))")
+              public void userServiceMethods() {
+                  // This method is just a placeholder for the pointcut expression
+              }
+        
+              // Step 3: Use the pointcut in an advice
+              @Before("userServiceMethods()")
+              public void logBeforeUserServiceMethods() {
+                  System.out.println("Before executing a method in UserService");
+              }
+          }
+        ```
+- Advice: Action taken by an aspect at a particular join point. Types of advice include:
+    - Before: Runs before the method execution.
+    - After: Runs after the method execution (regardless of outcome).
+    - After Returning: Runs after the method execution only if it completes successfully.
+    - After Throwing: Runs if the method throws an exception.
+    - Around: Surrounds the method execution, allowing you to control when the method is executed.
+### Example
+1. Add dependency
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+```
+2. Create a Service class
+```java
+import org.springframework.stereotype.Service;
+@Service
+public class UserService {
+
+    public void createUser(String name) {
+        System.out.println("Creating user: " + name);
+    }
+
+    public void deleteUser(String name) {
+        System.out.println("Deleting user: " + name);
+    }
+}
+```
+3. Create an Aspect class
+```java
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.demo.UserService.*(..))")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("Before method: " + joinPoint.getSignature().getName());
+    }
+
+    @After("execution(* com.example.demo.UserService.*(..))")
+    public void logAfter(JoinPoint joinPoint) {
+        System.out.println("After method: " + joinPoint.getSignature().getName());
+    }
+
+    @AfterReturning(pointcut = "execution(* com.example.demo.UserService.*(..))", returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+        System.out.println("Method returned: " + joinPoint.getSignature().getName());
+    }
+
+    @AfterThrowing(pointcut = "execution(* com.example.demo.UserService.*(..))", throwing = "error")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
+        System.out.println("Exception in method: " + joinPoint.getSignature().getName());
+        System.out.println("Error: " + error);
+    }
+}
+```
+- What’s Happening?
+  - @Aspect: Marks the class as an aspect.
+  - @Before, @After, etc.: Define when the advice runs.
+  - execution(...): Pointcut expression that matches method executions.
+  - how to infer param to execution(* *.*.checkout())
+    - any return type
+    - any package
+    - any class
+    - checkout() method
+    - any param
+- Common Pointcut Examples
+  - execution(* com.example..*(..)): Matches all methods in the com.example package and its sub-packages.
+  - execution(public * *(..)): Matches all public methods.
+  - execution(* *..set*(..)): Matches all setter methods.
+  - within(com.example..*): Matches all methods within classes in the com.example package and its sub-packages.
+  - args(String): Matches methods that take a String argument.
+  - this(com.example.MyInterface): Matches methods in beans that implement MyInterface.
+  - target(com.example.MyClass): Matches methods in beans of type MyClass.
+- we can use JoinPoint object to read param as below
+```java
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.UserService.createUser(..))")
+    public void logMethodParams(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs(); // Get method arguments
+
+        System.out.println("Method: " + joinPoint.getSignature().getName());
+        for (int i = 0; i < args.length; i++) {
+            System.out.println("Arg " + i + ": " + args[i]);
+        }
+    }
+}
+```
+## Spring-Batch
+
+## Spring-WebFlux
+
 
 
 
