@@ -5,8 +5,8 @@
 [Issues With Microservices](#Issues-With-Microservices) | [Hystrix](#Hystrix) | [BulkHead Pattern](#BulkHead-Pattern) | [Virtual vs Platform Threads](#Virtual-vs-Platform-Threads) |
 [Spring Security](#Spring-Security) | [Multi data source](Multi-data-source) | [Spring Caching](#Spring-Caching) | [PACT](#PACT) | [CDC](#CDC) | [Exceptions](#Exceptions-Handling) |
 [Request Validation](#Request-Validation) | [Custom HTTP Status](#Custom-HTTP-Status) | [DataBase Configuration](#DataBase-Configuration) |
-[Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) | 
-[Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Caching](#Caching)
+[Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) |
+[Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Caching](#Caching) | [Beans](#Beans)
 ## Annotations
 - @SpringBootApplication
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
@@ -253,14 +253,14 @@ with Spring security we can manage
     - Log the error for debugging
     - Avoid exposing sensitive internal details
 - Using @ControllerAdvice for Global Exception Handling
-  - Define a Custom Exception
+    - Define a Custom Exception
   ```java
-public class ResourceNotFoundException extends RuntimeException {
-public ResourceNotFoundException(String message) {
- super(message);
-}
-}
-```
+    public class ResourceNotFoundException extends RuntimeException {
+      public ResourceNotFoundException(String message) {
+      super(message);
+     }
+    }
+  ```
   - Create the Global Exception Handler
   ```java
   @ControllerAdvice
@@ -286,9 +286,9 @@ public ResourceNotFoundException(String message) {
           return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
       }
   	}
-  	  ```
+  ```
   	  - Throw the Exception in Any Class
-  	    ```java
+  ```java
   	    @GetMapping("/users/{id}")
   	public User getUser(@PathVariable int id) {
   	    User user = userService.findById(id);
@@ -297,7 +297,7 @@ public ResourceNotFoundException(String message) {
   	    }
   	    return user;
   	}
-  	    ```
+  ```
   	  - @ControllerAdvice	Automatically intercepts exceptions thrown in controllers
     - @ExceptionHandler	Handles specific exception types
 ## Request-Validation
@@ -587,18 +587,18 @@ public class MyAppReadyListener implements ApplicationListener<ApplicationReadyE
 - Use PlatformTransactionManager and TransactionTemplate for fine-grained control over transactions in code.
 - Manually begin, commit, and rollback transactions as needed.
 ```java
-@Autowired
-private PlatformTransactionManager transactionManager;
-public void performTransaction() {
-    TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-    try {
-        // Business logic here
-        transactionManager.commit(status);
-    } catch (Exception e) {
-        transactionManager.rollback(status);
-        throw e;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+    public void performTransaction() {
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        try {
+            // Business logic here
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            throw e;
+        }
     }
-}
 ```
 
 ### Transaction Propagation
@@ -655,46 +655,46 @@ public List<Entity> fetchEntities() {
 ```
 
 ## AOP
-- Aspect-Oriented Programming allows you to separate cross-cutting concerns (like logging, security, transactions) from your business logic. 
+- Aspect-Oriented Programming allows you to separate cross-cutting concerns (like logging, security, transactions) from your business logic.
 - In Spring Boot, AOP is commonly used for:
-  - Logging
-  - Performance monitoring
-  - Security checks
-  - Exception handling
+    - Logging
+    - Performance monitoring
+    - Security checks
+    - Exception handling
 ### Key Concepts
 - Aspect: A modularization of a concern that cuts across multiple classes. It is a class that contains advice and pointcuts.
 - Join Point: A specific point in the execution of a program, such as method execution or exception handling.
 - Pointcut: A rule that selects which Join Points to apply logic to. It defines where advice should be applied.
-  - @Pointcut("within(com.example..*)") // all methods in com.example package
-  - @Pointcut("execution(* com.example.service.*.*(..))") // all methods in service package
-  - Why Use @Pointcut?
-    - Reusability: You can reference the same pointcut in multiple advices.
-    - Readability: Gives meaningful names to complex expressions.
-    - Maintainability: Easier to update one pointcut than multiple expressions.
-    - Example
-      ```java
-          import org.aspectj.lang.annotation.Aspect;
-          import org.aspectj.lang.annotation.Pointcut;
-          import org.aspectj.lang.annotation.Before;
-          import org.springframework.stereotype.Component;
-        
-          @Aspect
-          @Component
-          public class LoggingAspect {
-        
-              // Step 2: Define a reusable pointcut
-              @Pointcut("execution(* com.example.service.UserService.*(..))")
-              public void userServiceMethods() {
-                  // This method is just a placeholder for the pointcut expression
+    - @Pointcut("within(com.example..*)") // all methods in com.example package
+    - @Pointcut("execution(* com.example.service.*.*(..))") // all methods in service package
+    - Why Use @Pointcut?
+        - Reusability: You can reference the same pointcut in multiple advices.
+        - Readability: Gives meaningful names to complex expressions.
+        - Maintainability: Easier to update one pointcut than multiple expressions.
+        - Example
+          ```java
+              import org.aspectj.lang.annotation.Aspect;
+              import org.aspectj.lang.annotation.Pointcut;
+              import org.aspectj.lang.annotation.Before;
+              import org.springframework.stereotype.Component;
+            
+              @Aspect
+              @Component
+              public class LoggingAspect {
+            
+                  // Step 2: Define a reusable pointcut
+                  @Pointcut("execution(* com.example.service.UserService.*(..))")
+                  public void userServiceMethods() {
+                      // This method is just a placeholder for the pointcut expression
+                  }
+            
+                  // Step 3: Use the pointcut in an advice
+                  @Before("userServiceMethods()")
+                  public void logBeforeUserServiceMethods() {
+                      System.out.println("Before executing a method in UserService");
+                  }
               }
-        
-              // Step 3: Use the pointcut in an advice
-              @Before("userServiceMethods()")
-              public void logBeforeUserServiceMethods() {
-                  System.out.println("Before executing a method in UserService");
-              }
-          }
-        ```
+            ```
 - Advice: Action taken by an aspect at a particular join point. Types of advice include:
     - Before: Runs before the method execution.
     - After: Runs after the method execution (regardless of outcome).
@@ -757,23 +757,23 @@ public class LoggingAspect {
 }
 ```
 - What’s Happening?
-  - @Aspect: Marks the class as an aspect.
-  - @Before, @After, etc.: Define when the advice runs.
-  - execution(...): Pointcut expression that matches method executions.
-  - how to infer param to execution(* *.*.checkout())
-    - any return type
-    - any package
-    - any class
-    - checkout() method
-    - any param
+    - @Aspect: Marks the class as an aspect.
+    - @Before, @After, etc.: Define when the advice runs.
+    - execution(...): Pointcut expression that matches method executions.
+    - how to infer param to execution(* *.*.checkout())
+        - any return type
+        - any package
+        - any class
+        - checkout() method
+        - any param
 - Common Pointcut Examples
-  - execution(* com.example..*(..)): Matches all methods in the com.example package and its sub-packages.
-  - execution(public * *(..)): Matches all public methods.
-  - execution(* *..set*(..)): Matches all setter methods.
-  - within(com.example..*): Matches all methods within classes in the com.example package and its sub-packages.
-  - args(String): Matches methods that take a String argument.
-  - this(com.example.MyInterface): Matches methods in beans that implement MyInterface.
-  - target(com.example.MyClass): Matches methods in beans of type MyClass.
+    - execution(* com.example..*(..)): Matches all methods in the com.example package and its sub-packages.
+    - execution(public * *(..)): Matches all public methods.
+    - execution(* *..set*(..)): Matches all setter methods.
+    - within(com.example..*): Matches all methods within classes in the com.example package and its sub-packages.
+    - args(String): Matches methods that take a String argument.
+    - this(com.example.MyInterface): Matches methods in beans that implement MyInterface.
+    - target(com.example.MyClass): Matches methods in beans of type MyClass.
 - we can use JoinPoint object to read param as below
 ```java
 import org.aspectj.lang.JoinPoint;
@@ -945,6 +945,126 @@ public class LoggingAspect {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
     }
 ```
+## Beans
+- Getting hold of bean
+```java
+    @Autowired
+    private ApplicationContext applicationContext;
+    
+    MyService myService = applicationContext.getBean(MyService.class);
+```
+- Types of injection
+  - Field Injection (using @Autowired on field)
+      ```java
+            @Autowired
+            private MyService myService;
+      ```
+  - Setter Injection (using @Autowired on setter method)
+    ```java
+            private MyService myService;
+            
+            @Autowired
+            public void setMyService(MyService myService) {
+                this.myService = myService;
+            }
+    ```
+  - Constructor Injection (using @Autowired on constructor or without it if there is only one constructor)
+  - Most recommended as it makes the class immutable and easier to test
+    ```java
+            private final MyService myService;
+            
+            @Autowired
+            public MyComponent(MyService myService) {
+                this.myService = myService;
+            }
+    ```
+    - Cyclic Dependency
+        - Occurs when two or more beans depend on each other directly or indirectly, creating a circular reference.
+        - Example
+          ```java
+                @Component
+                public class A {
+                    @Autowired
+                    private B b;
+                }
+                
+                @Component
+                public class B {
+                    @Autowired
+                    private A a;
+                }
+          ```
+        - Solutions
+            - Refactor the design to eliminate the circular dependency.
+            - Use setter injection for one of the beans instead of constructor injection.
+            - Use @Lazy annotation on one of the dependencies to delay its initialization.
+            - Use ApplicationContext to get the bean manually when needed.
+            - Use interfaces to break the direct dependency.
+            - Use @PostConstruct to initialize one of the beans after both are created.
+          ```java
+            @Component
+            public class A {
+            @Autowired
+            private B b;
+              @PostConstruct
+              public void init() {
+                  b.setA(this);
+              }
+            }
+
+            @Component
+            public class B {
+            private A a;
+            public void setA(A a) {
+                this.a = a;
+            }
+          ```
+    - Unsatfisied Dependency
+        - Occurs when Spring cannot find a suitable bean to inject into a dependency.
+        - Common causes
+            - Missing @Component, @Service, @Repository, or @Configuration annotation on the class.
+            - Bean is defined in a package not scanned by Spring (missing @ComponentScan).
+            - Multiple beans of the same type exist and Spring cannot determine which one to inject (ambiguity).
+            - Incorrect bean name specified in @Qualifier annotation.
+            - Bean is defined with a different scope than expected (e.g., prototype vs singleton).
+        - Solutions
+            - Ensure the class is annotated with the appropriate stereotype annotation.
+            - Verify that the package containing the bean is included in component scanning.
+            - Use @Qualifier to specify which bean to inject when multiple candidates exist.
+            - Check for typos in bean names and ensure they match exactly.
+            - Ensure that the bean's scope aligns with how it is being used.
+            - Define a default bean using @Primary annotation if multiple beans of the same type exist.
+    - @PostConstruct
+        - Used to annotate a method that should be executed after the bean's properties have been set and before the bean is put into service.
+        - Commonly used for initialization logic that depends on injected properties.
+        - Example
+          ```java
+                @Component
+                public class MyBean {
+                    @Autowired
+                    private MyService myService;
+                    
+                    @PostConstruct
+                    public void init() {
+                        // Initialization logic here
+                        myService.setup();
+                    }
+                }
+          ```
+    - @PreDestroy
+        - Used to annotate a method that should be executed just before the bean is destroyed by the container.
+        - Commonly used for cleanup logic, such as releasing resources or closing connections.
+        - Example
+          ```java
+                @Component
+                public class MyBean {
+                    @PreDestroy
+                    public void cleanup() {
+                        // Cleanup logic here
+                        System.out.println("Bean is being destroyed");
+                    }
+                }
+          ```
 
 
 ```TODO
