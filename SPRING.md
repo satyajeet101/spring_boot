@@ -37,10 +37,10 @@
     - @Value("${my.name: default value}")
     - @Value("some static message") private String str;
     - @Value("${my.values}") private List<String>listValue
-- @ConfigurationProperties("db")
-    - put this on class and that class property will be bind by db.propName in property file
-      will be assigned to respective property of the class
-    - If Propert name is "driverClassName" then in propert file it should be "db.driver-class-name"
+- @ConfigurationProperties("db") // anything starting with db like db.host, db.name
+  will be assigned to respective property of the class
+- @Builder // Lombok to use builder pattern
+- @ToString // Lombok
 - @SpringBootTest integration testing and it sets the spring context
 - @MockBean create a fake bean during unit testing
 - @Transactional
