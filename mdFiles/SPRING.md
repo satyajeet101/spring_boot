@@ -8,7 +8,7 @@
 [Runtime Load](#Runtime-Load) | [Transaction](#Transaction) | [AOP](#AOP) | [Spring Batch](#Spring-Batch) |
 [Spring WebFlux](#Spring-WebFlux) | [Log](#Log) | [Caching](#Caching)
 ## Annotations
-- <span style="color:red>@SpringBootApplication</span>
+- <div style="color:red>@SpringBootApplication</div>
     - @Configuration + @EnableAutoConfiguration + @ComponentScan
 - @Component
     - if a class doesn't fit into controller, Repo or service we can mark with this to be managed by spring
